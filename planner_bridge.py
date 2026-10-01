@@ -19,7 +19,7 @@ import math
 import torch
 import torch.nn.functional as F
 
-from ttc_planner import make_candidates
+from seeing_in_time.ttc_planner import make_candidates
 
 
 class TTCPlannerBridge:

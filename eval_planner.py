@@ -2,16 +2,28 @@
 Evaluate a trained policy in the training sim, with or without the TTC planner.
 
 Same env, model and observation pipeline as training; no losses, no optimizer,
-no gradients. Run twice with the same seed to compare on identical scenes:
+no gradients. Run from the repo root (so configs/ and checkpoints/ resolve):
 
-    python eval_planner.py --resume checkpoints/ttc/checkpoint0004.pth --use_ttc
-    python eval_planner.py --resume checkpoints/ttc/checkpoint0004.pth --use_ttc --use_planner
+    python seeing_in_time/eval_planner.py $(cat configs/single_agent.args) --use_ttc --resume <ckpt>
+    python seeing_in_time/eval_planner.py $(cat configs/single_agent.args) --use_ttc --resume <ckpt> --layer_b
 
 Pass the same observation flags (--use_ttc, --no_odom, --use_harmonic, ...)
 that the checkpoint was trained with.
 
-Needs ttc_planner.py and planner_bridge.py next to this file.
+Layout: this file and the planner modules live in seeing_in_time/; the sim
+(env_cuda.py, model.py, Harmonic_FN/) lives in the repo root.
 """
+
+import os
+import sys
+
+# Make both the repo root (env_cuda, model, Harmonic_FN) and this folder
+# (planner and Layer B modules) importable, wherever the script is run from.
+_HERE = os.path.dirname(os.path.abspath(__file__))
+_ROOT = os.path.dirname(_HERE)
+for _p in (_ROOT, _HERE):
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
 
 import argparse
 import math
@@ -26,7 +38,7 @@ import quadsim_cuda
 from env_cuda import Env
 from model import Model
 from planner_bridge import TTCPlannerBridge
-from layer_b import LayerB
+from seeing_in_time.layer_b import LayerB
 
 
 @torch.no_grad()
